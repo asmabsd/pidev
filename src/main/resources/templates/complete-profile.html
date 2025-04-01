@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Complete Your Profile</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Complete Your Profile</h1>
+<form id="profileForm">
+    <input type="hidden" id="token" th:value="${token}">
+
+    <div>
+        <label for="nTel">Phone Number:</label>
+        <input type="text" id="nTel" name="nTel" required
+               pattern="^[0-9]{8}$" title="Exactly 8 digits">
+    </div>
+
+    <div>
+        <label for="numPasseport">Passport Number:</label>
+        <input type="text" id="numPasseport" name="numPasseport" required
+               pattern="^[A-Za-z0-9]{9}$" title="Exactly 9 alphanumeric characters">
+    </div>
+
+    <button type="submit">Complete Profile</button>
+</form>
+
+<script>
+    $(document).ready(function() {
+        $('#profileForm').submit(function(e) {
+            e.preventDefault();
+
+            const token = $('#token').val();
+            const nTel = $('#nTel').val();
+            const numPasseport = $('#numPasseport').val();
+
+            $.ajax({
+                url: '/complete-profile',
+                type: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                data: {
+                    nTel: nTel,
+                    numPasseport: numPasseport
+                },
+                success: function(response) {
+                    window.location.href = response.redirect;
+                },
+                error: function(xhr) {
+                    alert('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
