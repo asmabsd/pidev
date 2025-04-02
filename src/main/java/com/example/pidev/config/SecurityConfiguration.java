@@ -53,7 +53,9 @@ public class SecurityConfiguration {
                                 "/complete-profile/**",
                                 "/api/users/**",
                                 "/Guide/addGuide/**",
-                                "/gastronomy/addGastronomy/**"
+                                "/gastronomy/addGastronomy/**",
+                                "/souvenir/addSouvenir/**",
+                                "/activity/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

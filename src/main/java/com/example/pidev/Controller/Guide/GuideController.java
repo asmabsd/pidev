@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/Guide")
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@CrossOrigin("http://localhost:4200/dashbaord/addGuide")
+@CrossOrigin("http://localhost:4200")
 
 public class GuideController {
     @Autowired
