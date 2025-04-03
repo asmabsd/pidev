@@ -7,12 +7,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 
 import java.util.List;
 
@@ -28,14 +29,13 @@ public class SecurityConfiguration {
     public SecurityConfiguration(
             JwtAuthenticationFilter jwtAuthenticationFilter,
             AuthenticationProvider authenticationProvider,
-             CustomOAuth2UserService customOAuth2UserService,
+            CustomOAuth2UserService customOAuth2UserService,
             OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler
     ) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
-
     }
 
     @Bean
@@ -43,7 +43,7 @@ public class SecurityConfiguration {
         http
                 .csrf().disable()
                 .cors().configurationSource(corsConfigurationSource()).and()
-                .authorizeHttpRequests(auth -> auth
+                .authorizeRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
                                 "/oauth2/**",
@@ -55,7 +55,8 @@ public class SecurityConfiguration {
                                 "/Guide/addGuide/**",
                                 "/gastronomy/addGastronomy/**",
                                 "/souvenir/addSouvenir/**",
-                                "/activity/**"
+                                "/activity/**",
+                                "/Guide/viewGuide"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -63,14 +64,13 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .oauth2Login(oauth -> oauth
-                        .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(oAuth2LoginSuccessHandler)
-                        .failureUrl("/login?error=oauth_error")
+                        .loginPage("http://localhost:4200/login") // Redirection vers la page de login Angular après le succès de l'authentification
                 )
-                .authenticationProvider(authenticationProvider) // ✅ Move this AFTER .oauth2Login()
+                .authenticationProvider(authenticationProvider) // Move this AFTER .oauth2Login()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -79,15 +79,16 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Allow your Angular app
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow these methods
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept")); // Allow necessary headers
-        configuration.setAllowCredentials(true); // Allow credentials if needed
-        configuration.setExposedHeaders(List.of("Authorization")); // Add this to expose JWT token
-        configuration.setAllowCredentials(true); // Important for OAuth2 and JWT
+        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Autoriser ton app Angular
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Autoriser ces méthodes
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept")); // Autoriser ces headers nécessaires
+        configuration.setAllowCredentials(true); // Autoriser les credentials si besoin
+        configuration.setExposedHeaders(List.of("Authorization")); // Exposer ce header pour le token JWT
+        configuration.setAllowCredentials(true); // Important pour OAuth2 et JWT
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply this CORS configuration to all routes
+        source.registerCorsConfiguration("/**", configuration); // Appliquer cette configuration CORS à toutes les routes
 
         return source;
-    }}
+    }
+}
