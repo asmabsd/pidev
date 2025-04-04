@@ -56,7 +56,8 @@ public class SecurityConfiguration {
                                 "/gastronomy/addGastronomy/**",
                                 "/souvenir/addSouvenir/**",
                                 "/activity/**",
-                                "/Guide/viewGuide"
+                                "/Guide/viewGuide",
+                                "/hebergement/addhebergement/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -79,7 +80,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Autoriser ton app Angular
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));  // Allow specific origins // Autoriser ton app Angular
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Autoriser ces méthodes
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept")); // Autoriser ces headers nécessaires
         configuration.setAllowCredentials(true); // Autoriser les credentials si besoin

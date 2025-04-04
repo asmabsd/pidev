@@ -1,93 +1,140 @@
 package com.example.pidev.Controller.User;
 
 import com.example.pidev.entity.User.User;
+import com.example.pidev.entity.User.ResetPasswordToken;
 import com.example.pidev.repository.User.UserRepository;
 import com.example.pidev.service.User.EmailService;
 import com.example.pidev.service.User.PasswordService;
 import com.example.pidev.service.User.ResetPasswordTokenService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
-@Controller
-@RequestMapping("/users/views")
 
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin("http://localhost:4200")
 public class UserViewController {
-    @Autowired
 
     private final ResetPasswordTokenService tokenService;
-    @Autowired
-
     private final EmailService emailService;
-    @Autowired
-    private PasswordService passwordService;
+    private final PasswordService passwordService;
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-
-    public UserViewController(ResetPasswordTokenService tokenService, EmailService emailService, PasswordService passwordService) {
+    public UserViewController(ResetPasswordTokenService tokenService,
+                              EmailService emailService,
+                              PasswordService passwordService,
+                              UserRepository userRepository) {
         this.tokenService = tokenService;
         this.emailService = emailService;
         this.passwordService = passwordService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam String email, Model model) throws MessagingException {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            String token = tokenService.createResetToken(user.get());
-            emailService.sendResetPasswordEmail(email, token);
-            model.addAttribute("email", email); // Passe l'email au template HTML
-            return "forgot-password-success"; // Nom du fichier HTML sans extension
-        } else {
-            model.addAttribute("message", "Email non trouvé.");
-            return "reset-password-error"; // Page d'erreur
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        try {
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("success", false, "message", "Aucun utilisateur trouvé avec cet email"));
+            }
+
+            User user = userOptional.get();
+            String token = tokenService.createResetToken(user);
+            boolean emailSent = emailService.sendResetPasswordEmail(email, token);
+
+            if (!emailSent) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("success", false, "message", "Erreur lors de l'envoi de l'email"));
+            }
+
+            return ResponseEntity.ok()
+                    .body(Map.of("success", true, "message", "Email de réinitialisation envoyé", "email", email));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Erreur interne du serveur"));
         }
     }
-    @GetMapping("/reset-password")
-    public String showResetPasswordPage(@RequestParam String token, Model model) {
-        model.addAttribute("token", token); // Passe le token au template HTML
-        return "reset-password"; // Nom du fichier HTML sans extension
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateResetToken(@RequestParam String token) {
+        return tokenService.getToken(token)
+                .map(resetToken -> {
+                    if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+                        return ResponseEntity.ok()
+                                .body(Map.of("valid", false, "message", "Token expiré"));
+                    }
+                    return ResponseEntity.ok()
+                            .body(Map.of("valid", true, "message", "Token valide"));
+                })
+                .orElse(ResponseEntity.ok()
+                        .body(Map.of("valid", false, "message", "Token invalide")));
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-        return tokenService.getToken(token)
-                .map(resetToken -> {
-                    if (resetToken.getExpiryDate().isBefore(java.time.LocalDateTime.now())) {
-                        return "redirect:/users/reset-password-error?message=Token expiré.";
-                    }
-                    User user = resetToken.getUser();
-                    // Crypter le nouveau mot de passe avant de l'enregistrer
-                    String encryptedPassword = passwordService.encryptPassword(newPassword);
-                    user.setPassword(encryptedPassword);
-                    userRepository.save(user);
-                    return "redirect:/users/views/reset-password-success"; // Redirigez vers une page de succès
-                })
-                .orElse("redirect:/users/views/reset-password-error?message=Token invalide.");
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            Optional<ResetPasswordToken> tokenOptional = tokenService.getToken(request.getToken());
+            if (tokenOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Token invalide"));
+            }
+
+            ResetPasswordToken resetToken = tokenOptional.get();
+            if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Token expiré"));
+            }
+
+            if (request.getNewPassword() == null || request.getNewPassword().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Le mot de passe ne peut pas être vide"));
+            }
+
+            User user = resetToken.getUser();
+            String encryptedPassword = passwordService.encryptPassword(request.getNewPassword());
+            user.setPassword(encryptedPassword);
+            userRepository.save(user);
+
+            // Optionnel : Invalider le token après utilisation
+            // tokenService.invalidateToken(request.getToken());
+
+            return ResponseEntity.ok()
+                    .body(Map.of("success", true, "message", "Mot de passe réinitialisé avec succès"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Erreur lors de la réinitialisation du mot de passe"));
+        }
     }
 
-    @GetMapping("/forgot-password-success")
-    public String showForgotPasswordSuccessPage() {
-        return "forgot-password-success"; // Page de succès pour l'envoi du lien
-    }
+    public static class ResetPasswordRequest {
+        private String token;
+        private String newPassword;
 
-    @GetMapping("/reset-password-success")
-    public String showResetPasswordSuccessPage() {
-        return "reset-password-success"; // Page de succès pour la réinitialisation
-    }
+        // Getters et Setters
+        public String getToken() {
+            return token;
+        }
 
-    @GetMapping("/reset-password-error")
-    public String showResetPasswordErrorPage(@RequestParam String message, Model model) {
-        model.addAttribute("message", message); // Passe le message d'erreur au template
-        return "reset-password-error"; // Page d'erreur
-    }
+        public void setToken(String token) {
+            this.token = token;
+        }
 
+        public String getNewPassword() {
+            return newPassword;
+        }
+
+        public void setNewPassword(String newPassword) {
+            this.newPassword = newPassword;
+        }
+    }
 }
