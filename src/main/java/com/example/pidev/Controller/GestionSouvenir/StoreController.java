@@ -38,8 +38,9 @@ public class StoreController {
         return storeService.retrieveAllStore();
     }
 
-    @GetMapping("/retrieveStore")
-    Store retrieveStore(@RequestParam long id) {
+    @GetMapping("/retrieveStore/{id}")
+    Store retrieveStore(@PathVariable long id) {
         return storeService.retrieveStore(id);
     }
+
 }

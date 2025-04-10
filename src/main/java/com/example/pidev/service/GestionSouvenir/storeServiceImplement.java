@@ -35,4 +35,5 @@ public class storeServiceImplement implements iStoreService{
     public Store retrieveStore(Long idStore) {
         return storeRepository.findById(idStore).get();
     }
+
 }

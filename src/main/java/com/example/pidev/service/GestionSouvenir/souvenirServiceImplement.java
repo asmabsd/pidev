@@ -12,7 +12,6 @@ public class souvenirServiceImplement implements iSouvenirService {
 @Autowired
 SouvenirRepository souvenirRepository;
 
-
     @Override
     public Souvenir addSouvenir(Souvenir Souvenir) {
         return souvenirRepository.save(Souvenir);
@@ -37,4 +36,10 @@ SouvenirRepository souvenirRepository;
     public Souvenir retrieveSouvenir(Long idSouvenir) {
         return souvenirRepository.findById(idSouvenir).get();
     }
+
+    @Override
+    public List<Souvenir> retrieveSouvenirsByStoreId(Long storeId) {
+        return souvenirRepository.findByStoreId(storeId);
+    }
+
 }

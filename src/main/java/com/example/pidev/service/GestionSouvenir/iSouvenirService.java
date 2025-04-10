@@ -10,4 +10,6 @@ public interface iSouvenirService {
     void deleteSouvenir(Long idSouvenir);
     List<Souvenir> retrieveAllSouvenir();
     Souvenir retrieveSouvenir(Long idsouvenir);
+    List<Souvenir> retrieveSouvenirsByStoreId(Long storeId);
+
 }

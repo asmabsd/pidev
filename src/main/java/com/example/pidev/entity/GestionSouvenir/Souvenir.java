@@ -33,10 +33,11 @@ public class Souvenir {
     private List<CommandLine> commandLines;
 
     @ManyToOne
+
     private Store store;
 
     public void updateStatus() {
-        this.status = quantity > 0 ? "DISPONIBLE" : "NON DISPONIBLE";
+        this.status = quantity > 0 ? "IN STOCK" : "OUT OF STOCK";
     }
     public Long getId() {
         return id;

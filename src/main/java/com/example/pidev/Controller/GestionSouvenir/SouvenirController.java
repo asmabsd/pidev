@@ -44,6 +44,9 @@ public class SouvenirController {
     Souvenir retrieveSouvenir(@PathVariable Long id) {
         return souvenirService.retrieveSouvenir(id);
     }
-
+    @GetMapping("/store/{storeId}")
+    public List<Souvenir> getSouvenirsByStore(@PathVariable Long storeId) {
+        return souvenirService.retrieveSouvenirsByStoreId(storeId);
+    }
 
 }
