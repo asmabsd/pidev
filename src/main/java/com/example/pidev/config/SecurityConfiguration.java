@@ -57,7 +57,10 @@ public class SecurityConfiguration {
                                 "/souvenir/addSouvenir/**",
                                 "/activity/**",
                                 "/Guide/viewGuide",
-                                "/hebergement/addhebergement/**"
+                                "/hebergement/addhebergement/**",
+                                "/reservation/**",
+                                "/transport/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
