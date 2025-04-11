@@ -1,14 +1,20 @@
 package com.example.pidev.entity.hebergement;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 @Entity
 @Getter
 @Setter
@@ -21,6 +27,7 @@ public class ReservationChambre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_reservation;
+<<<<<<< HEAD
     private LocalDate dateDebut;
     private LocalDate dateFin;
     private int nombreadulte;
@@ -33,11 +40,27 @@ public class ReservationChambre {
     @JoinColumn(name = "id_hebergement")
     @JsonIgnoreProperties("reservationchambres") // Ignore la collection inverse dans Hebergement pour éviter la boucle
      Hebergement hebergement;
+=======
+
+    private String name;
+
+    private String type;
+
+    private String adresse;
+    private String description;
+    private String availability;
+    private Long price;
+
+
+    @ManyToOne
+    Hebergement hebergement;
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 
     public Long getId_reservation() {
         return id_reservation;
     }
 
+<<<<<<< HEAD
     public LocalDate getDateDebut() {
         return dateDebut;
     }
@@ -55,6 +78,30 @@ public class ReservationChambre {
 
     public Long getPrixTotal() {
         return prixTotal;
+=======
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getAvailability() {
+        return availability;
+    }
+
+    public Long getPrice() {
+        return price;
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
     }
 
     public Hebergement getHebergement() {
@@ -65,6 +112,7 @@ public class ReservationChambre {
         this.id_reservation = id_reservation;
     }
 
+<<<<<<< HEAD
     public void setDateDebut(LocalDate dateDebut) {
         this.dateDebut = dateDebut;
     }
@@ -82,11 +130,36 @@ public class ReservationChambre {
 
     public void setPrixTotal(Long prixTotal) {
         this.prixTotal = prixTotal;
+=======
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setAvailability(String availability) {
+        this.availability = availability;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
     }
 
     public void setHebergement(Hebergement hebergement) {
         this.hebergement = hebergement;
     }
+<<<<<<< HEAD
 
     public int getNombreadulte() {
         return nombreadulte;
@@ -103,4 +176,6 @@ public class ReservationChambre {
     public void setNombrenfant(int nombrenfant) {
         this.nombrenfant = nombrenfant;
     }
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 }

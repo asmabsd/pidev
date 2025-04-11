@@ -1,5 +1,6 @@
 package com.example.pidev.entity.hebergement;
 
+<<<<<<< HEAD
 import com.example.pidev.entity.User.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,6 +13,11 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+=======
+import jakarta.persistence.*;
+import lombok.*;
+
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 import java.util.Set;
 
 @Entity
@@ -25,6 +31,7 @@ public class Hebergement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_hebergement;
 
+<<<<<<< HEAD
     @NotBlank(message = "Le nom ne peut pas être nul")
     @Size(min = 3, max = 100, message = "Le nom doit contenir entre 3 et 100 caractères")
     private String name;
@@ -53,10 +60,29 @@ public class Hebergement {
     @JsonIgnoreProperties("hebergement") // Ignore le champ hebergement dans chaque réservation
 
     private Set<ReservationChambre> reservationchambres;
+=======
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    private TypeHebergement type;
+
+    private String adresse;
+    private String description;
+    private String availability;
+    private Long price;
+
+    /*@ManyToOne
+    User user;*/
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "hebergement")
+    private Set<ReservationChambre> reservationchambres;
+
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
     public Long getId_hebergement() {
         return id_hebergement;
     }
 
+<<<<<<< HEAD
 
     public String getImageUrl() {
         return imageUrl;
@@ -68,6 +94,8 @@ public class Hebergement {
 
     private String imageUrl;
 
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
     public String getName() {
         return name;
     }
@@ -127,10 +155,13 @@ public class Hebergement {
     public void setReservationchambres(Set<ReservationChambre> reservationchambres) {
         this.reservationchambres = reservationchambres;
     }
+<<<<<<< HEAD
     @ManyToOne
     User user;
 
     public User getUser() {
         return user;
     }
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 }

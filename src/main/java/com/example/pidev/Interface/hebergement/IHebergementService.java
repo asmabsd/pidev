@@ -14,6 +14,9 @@ public interface IHebergementService {
     public Hebergement affecterReservationAHebergement(Long idHebergement, Long idReservation) ;
     public ReservationChambre ajouterReservationEtAffecter(Long idHebergement, ReservationChambre reservation) ;
     public Hebergement affecterReservationsAHebergement(Long idHebergement, List<Long> idReservations) ;
+<<<<<<< HEAD
     List<ReservationChambre> getReservationsByHebergement(Long idHebergement);
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 
     }

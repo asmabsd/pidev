@@ -1,7 +1,10 @@
 package com.example.pidev.service.hebergement;
 
 import com.example.pidev.Interface.hebergement.IHebergementService;
+<<<<<<< HEAD
 import com.example.pidev.entity.exception.ResourceNotFoundException;
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 import com.example.pidev.entity.hebergement.Hebergement;
 import com.example.pidev.entity.hebergement.ReservationChambre;
 import com.example.pidev.repository.hebergement.HebergementRepository;
@@ -9,7 +12,10 @@ import com.example.pidev.repository.hebergement.ReservationChambreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 import java.util.List;
 
 @Service
@@ -55,6 +61,7 @@ public class HebergementService implements IHebergementService {
 
         return hebergement;
     }
+<<<<<<< HEAD
     @Override
     public ReservationChambre ajouterReservationEtAffecter(Long idHebergement, ReservationChambre reservation) {
         Hebergement hebergement = hebergementRepository.findById(idHebergement).orElseThrow(() -> new ResourceNotFoundException("Hebergement not found"));
@@ -70,6 +77,18 @@ public class HebergementService implements IHebergementService {
 
 
 
+=======
+    //  Ajouter une réservation et l’affecter à un hébergement
+    @Override
+    public ReservationChambre ajouterReservationEtAffecter(Long idHebergement, ReservationChambre reservation) {
+        Hebergement hebergement = hebergementRepository.findById(idHebergement).orElseThrow();
+
+        reservation.setHebergement(hebergement);
+        return reservationChambreRepository.save(reservation);
+    }
+
+
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
     // 🔹 Affecter plusieurs réservations à un hébergement
     @Override
     public Hebergement affecterReservationsAHebergement(Long idHebergement, List<Long> idReservations) {
@@ -83,6 +102,7 @@ public class HebergementService implements IHebergementService {
 
         return hebergement;
     }
+<<<<<<< HEAD
 
 
     @Override
@@ -98,4 +118,6 @@ public class HebergementService implements IHebergementService {
                 .toList();
     }
 
+=======
+>>>>>>> e57a0e99915b754d94251553a93aff07619f9ef2
 }
