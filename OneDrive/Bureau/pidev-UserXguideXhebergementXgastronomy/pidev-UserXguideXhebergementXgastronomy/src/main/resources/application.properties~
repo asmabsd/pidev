@@ -1,0 +1,46 @@
+# Nom de l'application
+spring.application.name=pidev
+
+# Configuration de la base de données MySQL
+spring.datasource.url=jdbc:mysql://localhost:3306/tourisme?createDatabaseIfNotExist=true
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# Configuration Hibernate/JPA
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+
+# Configuration du serveur
+server.port=8089
+server.servlet.context-path=/tourisme
+# Configuration SMTP pour Gmail
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=lefriiw@gmail.com
+spring.mail.password=cwfu bwfk breu mrxe
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.protocol=smtp
+# Google OAuth2 Configuration
+spring.security.oauth2.client.registration.google.client-id=1020444935500-kuitau1j44ejs6fstse3mckbepvkg806.apps.googleusercontent.com
+spring.security.oauth2.client.registration.google.client-secret=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
+spring.security.oauth2.client.registration.google.scope=profile,email
+
+
+# Désactiver Spring Security (si nécessaire)
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+# URL de réinitialisation du mot de passe
+
+# Activation des logs de débogage pour JavaMail
+logging.level.org.springframework.mail=DEBUG
+logging.level.jakarta.mail=DEBUG
+security.jwt.secret-key=17c370f3105d0be7161e0360969e3c3bc9219372738eb10445542a8d7d11cea3
+# 1h in millisecond
+security.jwt.expiration-time=3600000
+
+springdoc.api-docs.version=3.0.1
+springdoc.swagger-ui.path=/swagger-ui.html
