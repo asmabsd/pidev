@@ -1,7 +1,7 @@
 package com.example.pidev.entity.GestionSouvenir;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,12 +28,12 @@ public class Souvenir {
     private String status ;
     @Enumerated(EnumType.STRING)
     private CategorySouvenir category; // Ex: handicrafts, textiles, jewelry...
-    private String image;
+    @JsonIgnore
     @OneToMany(mappedBy = "souvenir", cascade = CascadeType.ALL)
     private List<CommandLine> commandLines;
+    private String photo;
 
     @ManyToOne
-
     private Store store;
 
     public void updateStatus() {
@@ -90,13 +90,7 @@ public class Souvenir {
         this.store = store;
     }
 
-    public String getImage() {
-        return image;
-    }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
 
     public List<CommandLine> getCommandLines() {
         return commandLines;
@@ -120,5 +114,13 @@ public class Souvenir {
 
     public void setStatus(String status) {
         status = status;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }

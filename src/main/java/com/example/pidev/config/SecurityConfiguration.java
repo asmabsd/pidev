@@ -55,7 +55,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/**").permitAll() // Allow access to all API endpoints
                         .requestMatchers("/Guide/**").permitAll()
                         .requestMatchers("/souvenir/**").permitAll()
+
                         .requestMatchers("/store/**").permitAll()
+                        .requestMatchers("/panel/**").permitAll()
                         .requestMatchers("/ReservationGuide/addReservationGuide").permitAll()
                         .requestMatchers("/ReservationGuide/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/Guide/updateGuide/**").permitAll() // Adjust access

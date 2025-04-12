@@ -1,13 +1,16 @@
 package com.example.pidev.entity.GestionSouvenir;
 
+import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-public class Panel {
-
+@JsonSerialize // Ajouter pour forcer la sérialisation
+public class Panel implements Serializable {
     private Date creationDate;
-    private List<CommandLine> commandLines;
+    private List<CommandLineDTO> commandLines;
     private double total;
 
     public Panel() {
@@ -16,46 +19,35 @@ public class Panel {
         this.total = 0;
     }
 
-    // Ajouter une CommandLine au Panel
-    public void addCommandLine(CommandLine commandLine) {
-        this.commandLines.add(commandLine);
+    public void addCommandLine(CommandLineDTO commandLineDTO) {
+        this.commandLines.add(commandLineDTO);
         updateTotal();
     }
 
-    // Supprimer une CommandLine spécifique
-    public void removeCommandLine(CommandLine commandLine) {
-        commandLines.remove(commandLine);
-        updateTotal();
+    public void removeCommandLine(int index) {
+        if(index >= 0 && index < commandLines.size()) {
+            commandLines.remove(index);
+            updateTotal();
+        }
     }
 
-    // Vider le panier
-    public void clearPanel() {
-        commandLines.clear();
-        this.total = 0;
+    public void updateTotal() {
+        this.total = commandLines.stream()
+                .mapToDouble(cl -> cl.getUnitPrice() * cl.getQuantity())
+                .sum();
     }
 
-    // Recalculer le total du panier
-    private void updateTotal() {
-        this.total = commandLines.stream().mapToDouble(CommandLine::getPrice).sum();
-    }
 
-    public List<CommandLine> getCommandLines() {
-        return commandLines;
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
+    // Supprimer les setters inutiles
+    public List<CommandLineDTO> getCommandLines() { return commandLines; }
+    public double getTotal() { return total; }
+    public Date getCreationDate() { return creationDate; }
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
-    public void setCommandLines(List<CommandLine> commandLines) {
+    public void setCommandLines(List<CommandLineDTO> commandLines) {
         this.commandLines = commandLines;
     }
 

@@ -1,57 +1,59 @@
 package com.example.pidev.service.GestionSouvenir;
 
+import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
+import com.example.pidev.entity.GestionSouvenir.Command;
+import com.example.pidev.entity.GestionSouvenir.CommandLine;
 import com.example.pidev.entity.GestionSouvenir.Panel;
+import com.example.pidev.entity.GestionSouvenir.Souvenir;
 import com.example.pidev.repository.GestionSouvenir.CommandLineRepository;
-import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.pidev.entity.GestionSouvenir.CommandLine;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class commandLineServiceImplement implements iCommandLineService {
     @Autowired
     CommandLineRepository commandLineRepository;
+    @Autowired
+    iSouvenirService souvenirService;
+
 
     @Override
-    public CommandLine addCommandLine(CommandLine commandLine) {
-        return commandLineRepository.save(commandLine);
-    }
-
-    private static final String CART_SESSION_KEY = "panel";
-
-    @Override
-    public CommandLine updateCommandLine(HttpSession session, CommandLine commandLine) {
-        commandLine.updatePriceFromQuantity();
-        commandLineRepository.save(commandLine);
-        Panel panel = (Panel) session.getAttribute(CART_SESSION_KEY);
-
-        if (panel == null) {
-            panel = new Panel();
-        }
-        CommandLine existingCommandLine = panel.getCommandLines().stream()
-                .filter(line -> line.getSouvenir().equals(commandLine.getSouvenir()))
-                .findFirst()
-                .orElse(null);
-
-        existingCommandLine.setQuantity(commandLine.getQuantity());
-        existingCommandLine.updatePriceFromQuantity();
-        return commandLineRepository.save(existingCommandLine);
+    public List<CommandLine> createFromPanel(Panel panel, Command command) {
+        return panel.getCommandLines().stream()
+                .map(dto -> convertToEntity(dto, command))
+                .peek(commandLineRepository::save)
+                .toList();
     }
 
     @Override
-    public void deleteCommandLine(Long idCommandLine) {
-        commandLineRepository.deleteById(idCommandLine);
+    public CommandLine convertToEntity(CommandLineDTO dto, Command command) {
+        Souvenir souvenir = souvenirService.retrieveSouvenir(dto.getSouvenir().getId());
+
+        return new CommandLine(
+                souvenir,
+                dto.getQuantity(),
+                command
+        );
     }
 
     @Override
-    public List<CommandLine> retrieveAllCommandLine() {
-        return commandLineRepository.findAll();
+    public List<CommandLineDTO> getCommandLinesForOrder(Long commandId) {
+        return commandLineRepository.findByCommandId(commandId).stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
     @Override
-    public CommandLine retrieveCommandLine(Long idCommandLine) {
-        return commandLineRepository.findById(idCommandLine).get();
+    public CommandLineDTO convertToDTO(CommandLine entity) {
+        CommandLineDTO dto = new CommandLineDTO();
+        dto.setSouvenir(entity.getSouvenir());
+        dto.setQuantity(entity.getQuantity());
+        dto.setUnitPrice(entity.getUnitPrice());
+        return dto;
     }
 }
+

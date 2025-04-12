@@ -1,60 +1,87 @@
 package com.example.pidev.service.GestionSouvenir;
 
-import com.example.pidev.entity.GestionSouvenir.CommandLine;
+import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
 import com.example.pidev.entity.GestionSouvenir.Panel;
 import com.example.pidev.entity.GestionSouvenir.Souvenir;
-import com.example.pidev.repository.GestionSouvenir.CommandLineRepository;
+import com.example.pidev.exception.InsufficientStockException;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
 
 @Service
 public class pannelServiceImplement implements iPanelService {
-    @Autowired
-    CommandLineRepository commandLineRepository;
     private static final String CART_SESSION_KEY = "panel";
-
     @Override
-    public void addToCart(HttpSession session, Souvenir souvenir) {
-        Panel panel = (Panel) session.getAttribute(CART_SESSION_KEY);
+    public void addToCart(HttpSession session, Souvenir souvenir, int quantity) {
+        Panel panel = getOrCreatePanel(session);
 
-        if (panel == null) {
-            panel = new Panel();
-        }
-        // Vérifier si le souvenir est déjà dans le panier
-        CommandLine existingCommandLine = panel.getCommandLines().stream()
-                .filter(line -> line.getSouvenir().equals(souvenir))
-                .findFirst()
-                .orElse(null);
-        if (existingCommandLine != null) {
-            // Si le produit est déjà dans le panier, mettre à jour la quantité
-            existingCommandLine.setQuantity(existingCommandLine.getQuantity() + 1);
-            existingCommandLine.updatePriceFromQuantity(); // Recalculer le prix basé sur la quantité
-            commandLineRepository.save(existingCommandLine); // Sauvegarder les modifications dans la base
+        // Trouver la ligne existante par ID de souvenir
+        Optional<CommandLineDTO> existingLineOpt = panel.getCommandLines().stream()
+                .filter(line -> line.getSouvenir().getId().equals(souvenir.getId()))
+                .findFirst();
+
+        if (existingLineOpt.isPresent()) {
+            CommandLineDTO existingLine = existingLineOpt.get();
+
+            // Valider le stock AVANT mise à jour
+            int newQuantity = existingLine.getQuantity() + quantity;
+            if (souvenir.getQuantity() < newQuantity) {
+                throw new InsufficientStockException("Stock insuffisant pour " + souvenir.getName()
+                        + ". Disponible: " + souvenir.getQuantity());
+            }
+
+            existingLine.setQuantity(newQuantity);
+
+            // Supprimer si quantité <= 0
+            if (newQuantity <= 0) {
+                panel.getCommandLines().remove(existingLine);
+            }
+
         } else {
-            // Sinon, créer une nouvelle ligne de commande avec la quantité spécifiée
-            CommandLine commandLine = new CommandLine(souvenir, 1); // Command peut être null si non spécifiée
-            commandLine.updatePriceFromQuantity(); // Calculer le prix en fonction de la quantité
-            commandLineRepository.save(commandLine); // Sauvegarder la nouvelle ligne dans la base
-            panel.addCommandLine(commandLine); // Ajouter la ligne au panier
+            // Valider le stock pour nouvelle ligne
+            if (souvenir.getQuantity() < quantity) {
+                throw new InsufficientStockException("Stock insuffisant pour " + souvenir.getName());
+            }
+
+            CommandLineDTO newLine = new CommandLineDTO(souvenir, quantity, souvenir.getPrice());
+            panel.addCommandLine(newLine);
         }
+
+        panel.updateTotal();
         session.setAttribute(CART_SESSION_KEY, panel);
     }
 
     @Override
-    public Panel getCart(HttpSession session) {
+    public void updateQuantity(HttpSession session, int itemIndex, int newQuantity) {
+        Panel panel = getOrCreatePanel(session);
+        if(itemIndex >= 0 && itemIndex < panel.getCommandLines().size()) {
+            CommandLineDTO line = panel.getCommandLines().get(itemIndex);
+            line.setQuantity(newQuantity);
+            panel.updateTotal();
+        }
+    }
+
+    private Panel getOrCreatePanel(HttpSession session) {
         Panel panel = (Panel) session.getAttribute(CART_SESSION_KEY);
-        return (panel != null) ? panel : new Panel();
+        if(panel == null) {
+            panel = new Panel();
+            session.setAttribute(CART_SESSION_KEY, panel);
+        }
+        return panel;
     }
 
     @Override
-    public void removeFromCart(HttpSession session, CommandLine commandLine) {
-        Panel panel = (Panel) session.getAttribute(CART_SESSION_KEY);
-        if (panel != null) {
-            panel.removeCommandLine(commandLine);
-            commandLineRepository.deleteById(commandLine.getId());
-            session.setAttribute(CART_SESSION_KEY, panel);
-        }
+    public Panel getCart(HttpSession session) {
+        return getOrCreatePanel(session);
+    }
+
+    @Override
+    public void removeFromCart(HttpSession session, int itemIndex) {
+        Panel panel = getOrCreatePanel(session);
+        panel.removeCommandLine(itemIndex);
     }
 
     @Override

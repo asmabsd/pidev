@@ -1,11 +1,14 @@
 package com.example.pidev.entity.GestionSouvenir;
 
+import com.example.pidev.entity.User.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,21 +18,22 @@ import java.util.List;
 @Getter
 @Setter
 public class Command {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Date dateCommand;
-    private String phone;
-    private String address;
-    private String postalCode;
-    @Enumerated(EnumType.STRING)
-    private Payment paymentMethod;
+
+    @ManyToOne
+    private User user;
+
+    @OneToMany(mappedBy = "command", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommandLine> commandLines = new ArrayList<>();
+
+    private double total;
+    private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     private CommandStatus status;
-    private double total;
-
-    @OneToMany(mappedBy = "command", cascade = CascadeType.ALL)
-    private List<CommandLine> commandLines;
 
     public Long getId() {
         return id;
@@ -39,45 +43,12 @@ public class Command {
         this.id = id;
     }
 
-    public Date getDateCommand() {
-        return dateCommand;
+    public User getUser() {
+        return user;
     }
 
-    public void setDateCommand(Date dateCommand) {
-        this.dateCommand = dateCommand;
-    }
-
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
-
-    public CommandStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CommandStatus status) {
-        this.status = status;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public List<CommandLine> getCommandLines() {
@@ -96,11 +67,40 @@ public class Command {
         this.total = total;
     }
 
-    public Payment getPaymentMethod() {
-        return paymentMethod;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setPaymentMethod(Payment paymentMethod) {
-        this.paymentMethod = paymentMethod;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
+
+    public CommandStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CommandStatus status) {
+        this.status = status;
+    }
+
+    // Enum des statuts possibles
+    public enum CommandStatus {
+        CREATED, PAID, SHIPPED, DELIVERED, CANCELLED
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.status = CommandStatus.CREATED;
+    }
+
+    // Méthode pour calculer le total
+    public void calculateTotal() {
+        this.total = commandLines.stream()
+                .mapToDouble(CommandLine::getTotalPrice)
+                .sum();
+    }
+
+    // Getters/Setters
 }
+

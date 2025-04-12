@@ -1,41 +1,26 @@
 package com.example.pidev.Controller.GestionSouvenir;
 
-import com.example.pidev.entity.GestionSouvenir.CommandLine;
+import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
 import com.example.pidev.service.GestionSouvenir.iCommandLineService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/pannel")
+@RequestMapping("/api/commands/{commandId}/lines")
 public class CommandLineController {
     @Autowired
     iCommandLineService commandLineService;
 
-    @PostMapping("/addCommandLine")
-    CommandLine commandLineAdd(@RequestBody CommandLine commandLine) {
-        return commandLineService.addCommandLine(commandLine);
-    }
-
-    @PutMapping("/updateCommandLine")
-    CommandLine commandLineUpdate(@RequestBody CommandLine commandLine, HttpSession session) {
-        return commandLineService.updateCommandLine(session, commandLine);
-    }
-
-    @DeleteMapping("/deleteCommandLine")
-    void commandLineDelete(@RequestParam long id) {
-        commandLineService.deleteCommandLine(id);
-    }
-
-    @GetMapping("/retrieveAllCommandLine")
-    List<CommandLine> retrieveAllCommandLine() {
-        return commandLineService.retrieveAllCommandLine();
-    }
-
-    @GetMapping("/retrieveCommandLine")
-    CommandLine retrieveCommandLine(@RequestParam long id) {
-        return commandLineService.retrieveCommandLine(id);
+    
+    @GetMapping
+    public ResponseEntity<List<CommandLineDTO>> getCommandLines(@PathVariable Long commandId) {
+        return ResponseEntity.ok(commandLineService.getCommandLinesForOrder(commandId));
     }
 }

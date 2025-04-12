@@ -3,6 +3,7 @@ package com.example.pidev.entity.User;
 
 import com.example.pidev.entity.GUIDE.ReservationGuide;
 import com.example.pidev.entity.Gastronomy.Gastronomy;
+import com.example.pidev.entity.GestionSouvenir.Command;
 import com.example.pidev.entity.GestionSouvenir.Store;
 import com.example.pidev.entity.activities.Blog;
 import com.example.pidev.entity.hebergement.Hebergement;
@@ -200,4 +201,6 @@ public class User implements UserDetails {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy="user")
     private Set<Blog> Blog;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="user")
+    private Set<Command> command;
 }

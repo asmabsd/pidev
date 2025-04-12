@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class souvenirServiceImplement implements iSouvenirService {
@@ -34,7 +35,8 @@ SouvenirRepository souvenirRepository;
 
     @Override
     public Souvenir retrieveSouvenir(Long idSouvenir) {
-        return souvenirRepository.findById(idSouvenir).get();
+        return souvenirRepository.findById(idSouvenir)
+                .orElseThrow(() -> new NoSuchElementException("Souvenir non trouvé avec ID: " + idSouvenir));
     }
 
     @Override
