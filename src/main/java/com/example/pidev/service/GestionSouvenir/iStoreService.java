@@ -9,5 +9,8 @@ public interface iStoreService {
     Store updateStore(Store store);
     void deleteStore(Long idStore);
     List<Store> retrieveAllStore();
+    List<Store> getInvalidStores();
+    List<Store> getValidStores();
     Store retrieveStore(Long idStore);
+    public Store updateStoreStatus(Long storeId);
 }

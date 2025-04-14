@@ -65,24 +65,31 @@ public class SouvenirController {
     private String uploadDir = "C:/Users/manso/pidev-final2/uploads";
 
     @GetMapping("/uploads/{imageName}")
-    public ResponseEntity<ConfigurationSource.Resource> getImage(@PathVariable String imageName) {
+    public ResponseEntity<Resource> getImage(@PathVariable String imageName) {
         try {
-            // Define the path to the image
+            // Définir le chemin vers l'image
             Path imagePath = Paths.get(uploadDir, imageName);
             Resource resource = new UrlResource(imagePath.toUri());
 
             if (resource.exists() && resource.isReadable()) {
-                return ResponseEntity.ok()
+                // Utiliser MediaType dynamique selon le type de fichier
+                MediaType mediaType = Files.probeContentType(imagePath) != null
+                        ? MediaType.parseMediaType(Files.probeContentType(imagePath))
+                        : MediaType.IMAGE_JPEG;  // Si le type MIME ne peut pas être détecté, utiliser par défaut JPEG
 
-                        .contentType(MediaType.IMAGE_JPEG) // Adjust this based on your image format (JPEG, PNG, etc.)
-                        .body((ConfigurationSource.Resource) resource);
+                return ResponseEntity.ok()
+                        .contentType(mediaType)
+                        .body(resource);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
         } catch (MalformedURLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
 
 
@@ -117,21 +124,34 @@ public class SouvenirController {
             @PathVariable long id,
             @RequestParam("file") MultipartFile file) {
         try {
-            // Save file to server
-            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Files.copy(file.getInputStream(), this.rootLocation.resolve(filename));
+            // Vérifier si le fichier est bien présent
+            if (file.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le fichier est vide.");
+            }
 
-            // Update guide with image path
-            Souvenir souvenir  = souvenirService.retrieveSouvenir(id);
+            // Enregistrer le fichier sur le serveur avec un nom unique
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path targetLocation = this.rootLocation.resolve(filename);
+            Files.copy(file.getInputStream(), targetLocation);
+
+            // Récupérer le souvenir à mettre à jour
+            Souvenir souvenir = souvenirService.retrieveSouvenir(id);
+            if (souvenir == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Souvenir non trouvé.");
+            }
+
+            // Mettre à jour le souvenir avec le chemin du fichier
             souvenir.setPhoto(filename);
             souvenirService.updateSouvenir(souvenir);
 
+            // Retourner le nom du fichier
             return ResponseEntity.ok(filename);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload image: " + e.getMessage());
+                    .body("Erreur lors de l'upload de l'image : " + e.getMessage());
         }
     }
+
 
 
 

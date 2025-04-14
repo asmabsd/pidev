@@ -43,4 +43,19 @@ public class StoreController {
         return storeService.retrieveStore(id);
     }
 
+
+    @GetMapping("/retrieveAllStoreInvalide")
+    List<Store> retrieveAllStoreInvalide() {
+        return storeService.getInvalidStores();
+    }
+
+    @GetMapping("/retrieveAllStoreValide")
+    List<Store> retrieveAllStoreValide() {
+        return storeService.getValidStores();
+    }
+
+    @PutMapping("/{id}/status")
+    public Store updateStoreStatus(@PathVariable Long id) {
+        return storeService.updateStoreStatus(id);
+    }
 }

@@ -11,4 +11,5 @@ public interface iPanelService {
     Panel getCart(HttpSession session);
     void removeFromCart(HttpSession session, int itemIndex);
     void clearCart(HttpSession session);
+
 }

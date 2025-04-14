@@ -25,7 +25,8 @@ public class Store {
     private String description;
     @Column(unique = true) // Ensure phone is unique
     private String phone;
-
+    @Enumerated(EnumType.STRING)
+    private StoreStatus status= StoreStatus.LOADING;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "store")
     @JsonIgnore
     private Set<Souvenir> souvenirs;
@@ -78,6 +79,14 @@ public class Store {
         this.souvenirs = souvenirs;
     }
 
-@ManyToOne
-User user;
+    @ManyToOne
+    User user;
+
+    public StoreStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(StoreStatus status) {
+        this.status = status;
+    }
 }
