@@ -12,11 +12,14 @@ public class Panel implements Serializable {
     private Date creationDate;
     private List<CommandLineDTO> commandLines;
     private double total;
+    private int totalItems;
+
 
     public Panel() {
         this.creationDate = new Date();
         this.commandLines = new ArrayList<>();
         this.total = 0;
+        this.totalItems = 0;
     }
 
     public void addCommandLine(CommandLineDTO commandLineDTO) {
@@ -53,5 +56,19 @@ public class Panel implements Serializable {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public int getTotalItems() {
+        int total = 0;
+        if (commandLines != null) {
+            for (CommandLineDTO line : commandLines) {
+                total += line.getQuantity(); // Additionnez les quantités
+            }
+        }
+        return total;
+    }
+
+    public void setTotalItems(int totalItems) {
+        this.totalItems = totalItems;
     }
 }
