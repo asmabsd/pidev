@@ -55,9 +55,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/**").permitAll() // Allow access to all API endpoints
                         .requestMatchers("/Guide/**").permitAll()
                         .requestMatchers("/souvenir/**").permitAll()
-
                         .requestMatchers("/store/**").permitAll()
-                        .requestMatchers("/panel/**").permitAll()
+                        .requestMatchers( "/panel/**").permitAll()
+
                         .requestMatchers("/ReservationGuide/addReservationGuide").permitAll()
                         .requestMatchers("/ReservationGuide/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/Guide/updateGuide/**").permitAll() // Adjust access
@@ -92,11 +92,12 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));  // Allow specific origins // Autoriser ton app Angular
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Autoriser ces méthodes
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS")); // Autoriser ces méthodes
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept")); // Autoriser ces headers nécessaires
         configuration.setAllowCredentials(true); // Autoriser les credentials si besoin
         configuration.setExposedHeaders(List.of("Authorization")); // Exposer ce header pour le token JWT
         configuration.setAllowCredentials(true); // Important pour OAuth2 et JWT
+        configuration.setAllowCredentials(true); // important pour HttpSession
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // Appliquer cette configuration CORS à toutes les routes

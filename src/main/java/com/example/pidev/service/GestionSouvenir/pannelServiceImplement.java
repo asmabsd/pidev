@@ -4,16 +4,23 @@ import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
 import com.example.pidev.entity.GestionSouvenir.Panel;
 import com.example.pidev.entity.GestionSouvenir.Souvenir;
 import com.example.pidev.exception.InsufficientStockException;
+import com.example.pidev.repository.GestionSouvenir.SouvenirRepository;
 import jakarta.servlet.http.HttpSession;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
 @Service
 public class pannelServiceImplement implements iPanelService {
+    @Autowired
+    iSouvenirService iSouvenirService;
     private static final String CART_SESSION_KEY = "panel";
+
     @Override
     public void addToCart(HttpSession session, Souvenir souvenir, int quantity) {
         Panel panel = getOrCreatePanel(session);
@@ -57,7 +64,7 @@ public class pannelServiceImplement implements iPanelService {
     @Override
     public void updateQuantity(HttpSession session, int itemIndex, int newQuantity) {
         Panel panel = getOrCreatePanel(session);
-        if(itemIndex >= 0 && itemIndex < panel.getCommandLines().size()) {
+        if (itemIndex >= 0 && itemIndex < panel.getCommandLines().size()) {
             CommandLineDTO line = panel.getCommandLines().get(itemIndex);
             line.setQuantity(newQuantity);
             panel.updateTotal();
@@ -66,7 +73,7 @@ public class pannelServiceImplement implements iPanelService {
 
     private Panel getOrCreatePanel(HttpSession session) {
         Panel panel = (Panel) session.getAttribute(CART_SESSION_KEY);
-        if(panel == null) {
+        if (panel == null) {
             panel = new Panel();
             session.setAttribute(CART_SESSION_KEY, panel);
         }
@@ -88,4 +95,34 @@ public class pannelServiceImplement implements iPanelService {
     public void clearCart(HttpSession session) {
         session.removeAttribute(CART_SESSION_KEY);
     }
+
+
+    @Override
+    public Panel updateEntireCart(HttpSession session, List<CommandLineDTO> updatedLines) {
+        Panel panel = getOrCreatePanel(session);
+        List<CommandLineDTO> newLines = new ArrayList<>();
+
+        for (CommandLineDTO updatedLine : updatedLines) {
+            Souvenir souvenir = iSouvenirService.retrieveSouvenir(updatedLine.getSouvenir().getId());
+
+            // Validation du stock
+            if (updatedLine.getQuantity() < 1 || updatedLine.getQuantity() > souvenir.getQuantity()) {
+                throw new IllegalArgumentException("Quantité invalide pour " + souvenir.getName());
+            }
+
+            CommandLineDTO newLine = new CommandLineDTO(
+                    souvenir,
+                    updatedLine.getQuantity(),
+                    souvenir.getPrice()
+            );
+            newLines.add(newLine);
+        }
+
+        panel.setCommandLines(newLines);
+        panel.updateTotal();
+        session.setAttribute(CART_SESSION_KEY, panel);
+        return panel;
+    }
+
 }
+

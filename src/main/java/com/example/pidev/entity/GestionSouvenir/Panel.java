@@ -21,7 +21,12 @@ public class Panel implements Serializable {
         this.total = 0;
         this.totalItems = 0;
     }
-
+//    public int getTotalItems() {
+//        if (commandLines == null) return 0;
+//        return commandLines.stream()
+//                .mapToInt(CommandLineDTO::getQuantity)
+//                .sum();
+//    }
     public void addCommandLine(CommandLineDTO commandLineDTO) {
         this.commandLines.add(commandLineDTO);
         updateTotal();
