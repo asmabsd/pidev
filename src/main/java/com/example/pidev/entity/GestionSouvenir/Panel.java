@@ -13,7 +13,27 @@ public class Panel implements Serializable {
     private List<CommandLineDTO> commandLines;
     private double total;
     private int totalItems;
+    private double discount;
+    private String appliedDiscountCode;
+    private transient Discount appliedDiscount; // Champ transient pour la session
 
+    public void applyDiscount(double discountAmount, Discount discount) {
+        this.total = Math.max(0, this.total - discountAmount);
+        this.discount = discountAmount;
+        this.appliedDiscountCode = discount.getCode();
+        this.appliedDiscount = discount; // Stocké uniquement en session
+    }
+
+    public void removeDiscount() {
+        this.total += this.discount; // Rétablir le total
+        this.discount = 0;
+        this.appliedDiscountCode = null;
+        this.appliedDiscount = null;
+    }
+//    public void applyDiscount(double discount) {
+//        this.total = Math.max(0, this.total - discount);
+//        this.discount = discount;
+//    }
 
     public Panel() {
         this.creationDate = new Date();
@@ -75,5 +95,29 @@ public class Panel implements Serializable {
 
     public void setTotalItems(int totalItems) {
         this.totalItems = totalItems;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
+    public String getAppliedDiscountCode() {
+        return appliedDiscountCode;
+    }
+
+    public void setAppliedDiscountCode(String appliedDiscountCode) {
+        this.appliedDiscountCode = appliedDiscountCode;
+    }
+
+    public Discount getAppliedDiscount() {
+        return appliedDiscount;
+    }
+
+    public void setAppliedDiscount(Discount appliedDiscount) {
+        this.appliedDiscount = appliedDiscount;
     }
 }

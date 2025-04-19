@@ -57,6 +57,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/souvenir/**").permitAll()
                         .requestMatchers("/store/**").permitAll()
                         .requestMatchers( "/panel/**").permitAll()
+                        .requestMatchers( "/discount/**").permitAll()
 
                         .requestMatchers("/ReservationGuide/addReservationGuide").permitAll()
                         .requestMatchers("/ReservationGuide/**").permitAll()

@@ -1,6 +1,7 @@
 package com.example.pidev.service.GestionSouvenir;
 
 import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
+import com.example.pidev.entity.GestionSouvenir.Discount;
 import com.example.pidev.entity.GestionSouvenir.Panel;
 import com.example.pidev.entity.GestionSouvenir.Souvenir;
 import com.example.pidev.exception.InsufficientStockException;
@@ -122,6 +123,11 @@ public class pannelServiceImplement implements iPanelService {
         panel.updateTotal();
         session.setAttribute(CART_SESSION_KEY, panel);
         return panel;
+    }
+
+    @Override
+    public void applyDiscount(Panel panel, double discountAmount, Discount discount) {
+        panel.applyDiscount(discountAmount, discount);
     }
 
 }
