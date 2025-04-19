@@ -1,7 +1,12 @@
 package com.example.pidev.entity.Transport;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
+import java.util.Set;
+
 
 @Entity
 @Getter
@@ -18,4 +23,9 @@ public class Transport {
     private String location;
     private String description;
     private String capacity;
+
+    @OneToMany(mappedBy = "transport", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<ReservationTransport> reservations;
+
 }

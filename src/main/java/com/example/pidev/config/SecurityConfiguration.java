@@ -42,7 +42,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors().configurationSource(corsConfigurationSource()).and()
+                .cors().and() // ✅ Ici on dit juste "active le CORS", Spring prendra automatiquement CorsConfig
                 .authorizeRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
@@ -50,6 +50,7 @@ public class SecurityConfiguration {
                                 "/login/**",
                                 "/users/views/**",
                                 "/complete-profile",
+                                "/reservation/add",
                                 "/complete-profile/**",
                                 "/api/users/**",
                                 "/Guide/addGuide/**",
@@ -60,7 +61,6 @@ public class SecurityConfiguration {
                                 "/hebergement/addhebergement/**",
                                 "/reservation/**",
                                 "/transport/**"
-
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -72,27 +72,14 @@ public class SecurityConfiguration {
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(oAuth2LoginSuccessHandler)
-                        .loginPage("http://localhost:4200/login") // Redirection vers la page de login Angular après le succès de l'authentification
+                        .loginPage("http://localhost:4200/login")
                 )
-                .authenticationProvider(authenticationProvider) // Move this AFTER .oauth2Login()
+                .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));  // Allow specific origins // Autoriser ton app Angular
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Autoriser ces méthodes
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept")); // Autoriser ces headers nécessaires
-        configuration.setAllowCredentials(true); // Autoriser les credentials si besoin
-        configuration.setExposedHeaders(List.of("Authorization")); // Exposer ce header pour le token JWT
-        configuration.setAllowCredentials(true); // Important pour OAuth2 et JWT
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Appliquer cette configuration CORS à toutes les routes
 
-        return source;
-    }
 }

@@ -3,6 +3,8 @@ package com.example.pidev.Controller.User;
 import com.example.pidev.entity.User.User;
 import com.example.pidev.service.User.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,4 +42,18 @@ public class UserController {
     public User updateUser(@PathVariable Long id, @RequestBody User user) { // Changement de int -> Long
         return userService.updateUser(id, user);
     }
+
+
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal User user) {
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(401).build(); // Non autorisé si l'utilisateur est nul
+        }
+    }
+
+
+
 }
+

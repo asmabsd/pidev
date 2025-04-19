@@ -41,6 +41,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        // Ignorer certaines routes publiques pour éviter 403 si pas de token
+        if (path.startsWith("/auth")
+                || path.startsWith("/api/users")
+                || path.startsWith("/oauth2")
+                || path.startsWith("/login")
+                || path.startsWith("/Guide/viewGuide")
+                || path.startsWith("/transport")
+                || path.startsWith("/reservation")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -74,4 +89,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }
+
 }
