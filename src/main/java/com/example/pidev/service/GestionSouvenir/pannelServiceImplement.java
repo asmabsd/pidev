@@ -94,6 +94,12 @@ public class pannelServiceImplement implements iPanelService {
 
     @Override
     public void clearCart(HttpSession session) {
+        Panel panel = getOrCreatePanel(session); // Ajouter cette ligne
+        panel.getCommandLines().clear();
+        panel.setTotal(0);
+        panel.setDiscount(0);
+        panel.setAppliedDiscountCode(null);
+        panel.setAppliedDiscount(null);
         session.removeAttribute(CART_SESSION_KEY);
     }
 
@@ -126,8 +132,8 @@ public class pannelServiceImplement implements iPanelService {
     }
 
     @Override
-    public void applyDiscount(Panel panel, double discountAmount, Discount discount) {
-        panel.applyDiscount(discountAmount, discount);
+    public void applyDiscount(Panel panel, Discount discount) {
+        panel.applyDiscount(discount);
     }
 
 }

@@ -31,21 +31,16 @@ public class CommandLine {
     private LocalDateTime createdAt;
 
     // Constructeurs
-    public CommandLine() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public CommandLine(Souvenir souvenir, int quantity) {
-        this.souvenir = souvenir;
-        this.quantity = quantity;
-        this.unitPrice = souvenir.getPrice();
-        this.createdAt = LocalDateTime.now();
-    }
-
+    // Dans CommandLine.java
     public CommandLine(Souvenir souvenir, int quantity, Command command) {
         this.souvenir = souvenir;
         this.quantity = quantity;
         this.command = command;
+        this.unitPrice = souvenir.getPrice(); // Ajouter cette ligne
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public CommandLine() {
     }
 
 

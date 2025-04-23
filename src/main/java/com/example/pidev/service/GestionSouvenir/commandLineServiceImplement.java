@@ -5,6 +5,7 @@ import com.example.pidev.entity.GestionSouvenir.Command;
 import com.example.pidev.entity.GestionSouvenir.CommandLine;
 import com.example.pidev.entity.GestionSouvenir.Panel;
 import com.example.pidev.entity.GestionSouvenir.Souvenir;
+import com.example.pidev.exception.InsufficientStockException;
 import com.example.pidev.repository.GestionSouvenir.CommandLineRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +32,16 @@ public class commandLineServiceImplement implements iCommandLineService {
 
     @Override
     public CommandLine convertToEntity(CommandLineDTO dto, Command command) {
+        // Dans commandLineServiceImplement.java
+
         Souvenir souvenir = souvenirService.retrieveSouvenir(dto.getSouvenir().getId());
 
-        return new CommandLine(
-                souvenir,
-                dto.getQuantity(),
-                command
-        );
+        if (souvenir.getQuantity() < dto.getQuantity()) {
+            throw new InsufficientStockException("Stock insuffisant pour " + souvenir.getName());
+        }
+
+        // Utiliser le constructeur qui initialise unitPrice
+        return new CommandLine(souvenir, dto.getQuantity(), command);
     }
 
     @Override

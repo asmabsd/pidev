@@ -99,7 +99,7 @@ public class PanelController {
                     .orElseThrow(() -> new IllegalArgumentException("Code promo invalide"));
 
             double discountAmount = discountService.calculateDiscount(code, panel);
-            panel.applyDiscount(discountAmount, discount);
+            panel.applyDiscount( discount);
 
             return ResponseEntity.ok(panel);
         } catch (IllegalArgumentException e) {

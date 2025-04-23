@@ -64,6 +64,20 @@ public class discountServiceImplement implements iDiscountService {
     }
 
     @Override
+    public Discount validateAndGetDiscount(String code, Panel panel) {
+        if (panel.getAppliedDiscountCode() != null) {
+            throw new IllegalArgumentException("Une réduction est déjà appliquée");
+        }
+
+        Discount discount = discountRepository.findByCodeAndActiveTrue(code)
+                .orElseThrow(() -> new IllegalArgumentException("Code promo invalide"));
+
+        // Validation de l'expiration et des conditions...
+        validateConditions(discount, panel);
+
+        return discount;
+    }
+    @Override
     public double calculatePercentage(Discount discount, Panel panel) {
         double baseAmount = discount.getApplicableCategory() == null ?
                 panel.getTotal() :

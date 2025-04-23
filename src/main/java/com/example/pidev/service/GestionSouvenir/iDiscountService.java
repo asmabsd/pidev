@@ -11,6 +11,8 @@ public interface iDiscountService {
     double calculatePercentage(Discount discount, Panel panel) ;
     double calculateFixed(Discount discount, Panel panel);
     double calculateBundle(Discount discount, Panel panel);
+
+    Discount validateAndGetDiscount(String code, Panel panel);
     List<Discount> getActiveDiscounts();
     void removeDiscount(Panel panel);
 }

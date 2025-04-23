@@ -16,5 +16,5 @@ public interface iPanelService {
     void removeFromCart(HttpSession session, int itemIndex);
     void clearCart(HttpSession session);
     Panel updateEntireCart(HttpSession session, List<CommandLineDTO> updatedLines);
-    void applyDiscount(Panel panel, double discountAmount, Discount discount);
+    void applyDiscount(Panel panel, Discount discount);
 }

@@ -16,24 +16,63 @@ public class Panel implements Serializable {
     private double discount;
     private String appliedDiscountCode;
     private transient Discount appliedDiscount; // Champ transient pour la session
+    private double subtotal; // Doit être inclus dans le JSON
 
-    public void applyDiscount(double discountAmount, Discount discount) {
-        this.total = Math.max(0, this.total - discountAmount);
-        this.discount = discountAmount;
+    // Ajouter explicitement les getters/setters pour Jackson
+    public double getSubtotal() {
+        return this.subtotal;
+    }
+
+    public void setSubtotal(double subtotal) {
+        this.subtotal = subtotal;
+    }
+    public void updateTotal() {
+        // 1. Calculer le sous-total (sans réduction)
+        this.subtotal = commandLines.stream()
+                .mapToDouble(cl -> cl.getUnitPrice() * cl.getQuantity())
+                .sum();
+
+        // 2. Réinitialiser le montant de la réduction
+        double discountAmount = 0;
+
+        // 3. Si une réduction est appliquée, recalculer
+        if (appliedDiscount != null) {
+            switch (appliedDiscount.getType()) {
+                case PERCENTAGE:
+                    discountAmount = subtotal * (appliedDiscount.getValue() / 100);
+                    break;
+                case FIXED:
+                    discountAmount = appliedDiscount.getValue();
+                    break;
+                case BUNDLE:
+                    long applicableItems = commandLines.stream()
+                            .filter(cl -> cl.getSouvenir().getCategory()
+                                    .equalsIgnoreCase(appliedDiscount.getApplicableCategory()))
+                            .mapToInt(CommandLineDTO::getQuantity)
+                            .sum();
+                    int bundles = (int) (applicableItems / appliedDiscount.getMinItems());
+                    discountAmount = bundles * appliedDiscount.getValue();
+                    break;
+            }
+            // S'assurer que la réduction ne dépasse pas le sous-total
+            discountAmount = Math.min(discountAmount, subtotal);
+        }
+
+        // 4. Calculer le total final
+        this.total = Math.max(0, subtotal - discountAmount);
+    }
+
+    public void applyDiscount(Discount discount) {
+        this.appliedDiscount = discount;
         this.appliedDiscountCode = discount.getCode();
-        this.appliedDiscount = discount; // Stocké uniquement en session
+        updateTotal(); // Recalcul immédiat
     }
 
     public void removeDiscount() {
-        this.total += this.discount; // Rétablir le total
-        this.discount = 0;
-        this.appliedDiscountCode = null;
         this.appliedDiscount = null;
+        this.appliedDiscountCode = null;
+        updateTotal(); // Recalcul immédiat
     }
-//    public void applyDiscount(double discount) {
-//        this.total = Math.max(0, this.total - discount);
-//        this.discount = discount;
-//    }
 
     public Panel() {
         this.creationDate = new Date();
@@ -59,11 +98,6 @@ public class Panel implements Serializable {
         }
     }
 
-    public void updateTotal() {
-        this.total = commandLines.stream()
-                .mapToDouble(cl -> cl.getUnitPrice() * cl.getQuantity())
-                .sum();
-    }
 
 
     // Supprimer les setters inutiles

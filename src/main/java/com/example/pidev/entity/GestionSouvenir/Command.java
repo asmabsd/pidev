@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -33,6 +32,7 @@ public class Command {
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private CommandStatus status;
 
     public Long getId() {
@@ -83,15 +83,10 @@ public class Command {
         this.status = status;
     }
 
-    // Enum des statuts possibles
-    public enum CommandStatus {
-        CREATED, PAID, SHIPPED, DELIVERED, CANCELLED
-    }
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.status = CommandStatus.CREATED;
+        this.status = CommandStatus.PENDING;
     }
 
     // Méthode pour calculer le total
@@ -100,7 +95,5 @@ public class Command {
                 .mapToDouble(CommandLine::getTotalPrice)
                 .sum();
     }
-
-    // Getters/Setters
 }
 
