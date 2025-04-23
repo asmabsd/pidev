@@ -1,7 +1,10 @@
 package com.example.pidev.entity.GestionSouvenir;
 
 import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
+import com.example.pidev.entity.User.User;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 import java.io.Serializable;
 import java.util.ArrayList;

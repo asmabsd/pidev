@@ -43,7 +43,6 @@ public class IaController {
         String name = (String) fields.get("name");
         String category = (String) fields.get("category");
         Double price = Double.valueOf(fields.get("price").toString());
-
         String desc = iaService.generateDescription(name, category, price);
         return ResponseEntity.ok(desc);
     }
