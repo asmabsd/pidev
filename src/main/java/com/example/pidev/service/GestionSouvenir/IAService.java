@@ -10,6 +10,7 @@ import java.util.Map;
 
 @Service
 public class IAService {
+    private final String API_KEY = "Ob9PCXvDGqeVd9BeQky1DkNsi2qeFpUD88irlNcV";
     private final String ENDPOINT = "https://api.cohere.ai/v1/generate";
 
     public String generateDescription(String name, String category, double price) {

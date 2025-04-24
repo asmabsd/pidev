@@ -26,6 +26,9 @@ public class Panel implements Serializable {
         return this.subtotal;
     }
 
+
+
+
     public void setSubtotal(double subtotal) {
         this.subtotal = subtotal;
     }
@@ -91,12 +94,15 @@ public class Panel implements Serializable {
 //    }
     public void addCommandLine(CommandLineDTO commandLineDTO) {
         this.commandLines.add(commandLineDTO);
+        this.totalItems += commandLineDTO.getQuantity(); // Mise à jour manuelle
         updateTotal();
     }
 
     public void removeCommandLine(int index) {
         if(index >= 0 && index < commandLines.size()) {
-            commandLines.remove(index);
+            CommandLineDTO removedLine = commandLines.remove(index);
+            this.totalItems -= removedLine.getQuantity(); // Mise à jour manuelle
+
             updateTotal();
         }
     }
@@ -114,6 +120,9 @@ public class Panel implements Serializable {
 
     public void setCommandLines(List<CommandLineDTO> commandLines) {
         this.commandLines = commandLines;
+        this.totalItems = commandLines.stream()
+                .mapToInt(CommandLineDTO::getQuantity)
+                .sum();
     }
 
     public void setTotal(double total) {
@@ -130,9 +139,7 @@ public class Panel implements Serializable {
         return total;
     }
 
-    public void setTotalItems(int totalItems) {
-        this.totalItems = totalItems;
-    }
+
 
     public double getDiscount() {
         return discount;

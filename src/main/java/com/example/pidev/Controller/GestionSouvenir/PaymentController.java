@@ -15,6 +15,7 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,7 @@ public class PaymentController {
     @PostMapping("/confirm-payment/{commandId}")
     public ResponseEntity<?> confirmPayment(
             @PathVariable Long commandId,
-            @RequestBody PaymentConfirmationRequest request) {
+            @RequestBody PaymentConfirmationRequest request, HttpSession session) {
 
         try {
             String returnUrl = "http://localhost:4200/payment-success/" + commandId;
@@ -140,6 +141,8 @@ public class PaymentController {
                 case "succeeded":
                     commandService.finalizeCommand(commandId);
                     logger.info("Paiement réussi pour la commande {}", commandId);
+                    // Vider le panier
+                    panelService.clearCart(session);
                     return ResponseEntity.ok()
                             .body(Map.of(
                                     "status", "CONFIRMED",
