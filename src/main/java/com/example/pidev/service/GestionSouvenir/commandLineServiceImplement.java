@@ -1,10 +1,7 @@
 package com.example.pidev.service.GestionSouvenir;
 
 import com.example.pidev.dtos.GestionSouvenir.CommandLineDTO;
-import com.example.pidev.entity.GestionSouvenir.Command;
-import com.example.pidev.entity.GestionSouvenir.CommandLine;
-import com.example.pidev.entity.GestionSouvenir.Panel;
-import com.example.pidev.entity.GestionSouvenir.Souvenir;
+import com.example.pidev.entity.GestionSouvenir.*;
 import com.example.pidev.exception.InsufficientStockException;
 import com.example.pidev.repository.GestionSouvenir.CommandLineRepository;
 import jakarta.transaction.Transactional;
@@ -59,5 +56,15 @@ public class commandLineServiceImplement implements iCommandLineService {
         dto.setUnitPrice(entity.getUnitPrice());
         return dto;
     }
+
+    @Override
+    public List<TopSellingSouvenir> findTopSellingSouvenirsByStore(Long storeId) {
+        return commandLineRepository.findTopSellingSouvenirsByStore(storeId);    }
+
+    @Override
+    public List<CommandLine> findConfirmedSalesByStore(Long storeId) {
+        return commandLineRepository.findConfirmedSalesByStore(storeId);
+    }
+
 }
 

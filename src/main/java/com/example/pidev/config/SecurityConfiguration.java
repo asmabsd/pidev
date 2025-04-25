@@ -60,6 +60,7 @@ public class SecurityConfiguration {
                         .requestMatchers( "/discount/**").permitAll()
                         .requestMatchers( "/payment/**").permitAll()
                         .requestMatchers( "/iA/**").permitAll()
+                        .requestMatchers( "/sales/**").permitAll()
                         .requestMatchers("/ReservationGuide/addReservationGuide").permitAll()
                         .requestMatchers("/ReservationGuide/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/Guide/updateGuide/**").permitAll() // Adjust access

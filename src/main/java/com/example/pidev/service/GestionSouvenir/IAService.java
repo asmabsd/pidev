@@ -20,8 +20,11 @@ public class IAService {
         headers.set("Authorization", "Bearer " + API_KEY);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String prompt = String.format("Rédige une description attrayante d’un souvenir appelé '%s' dans la catégorie '%s' qui coûte %.2f dinars.",
-                name, category, price);
+        // Prompt en anglais avec instruction de limiter à 150 caractères
+        String prompt = String.format(
+                "Write a short, attractive description in English of a souvenir called '%s' in the category '%s' that costs %.2f dinars. The description should be no longer than 150 characters.",
+                name, category, price
+        );
 
         Map<String, Object> body = new HashMap<>();
         body.put("model", "command");
@@ -35,9 +38,21 @@ public class IAService {
 
         if (response.getStatusCode() == HttpStatus.OK) {
             List<Map<String, String>> generations = (List<Map<String, String>>) response.getBody().get("generations");
-            return generations.get(0).get("text").trim();
+            String description = generations.get(0).get("text").trim();
+
+            // Vérifier et tronquer la description si elle dépasse 150 caractères
+            if (description.length() > 150) {
+                int lastSpace = description.lastIndexOf(' ', 150);
+                if (lastSpace > 0) {
+                    description = description.substring(0, lastSpace); // Tronquer au dernier espace
+                } else {
+                    description = description.substring(0, 150); // Tronquer à 150 si aucun espace
+                }
+            }
+
+            return description;
         }
 
-        return "Description non générée.";
+        return "Description not generated.";
     }
 }
