@@ -1,0 +1,17 @@
+package com.example.pidev.repository.activities;
+
+import com.example.pidev.entity.activities.Blog;
+import com.example.pidev.entity.activities.Region;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface BlogRepository extends JpaRepository<Blog,Long> {
+    List<Blog> findByUserId(Integer userId);
+    List<Blog> findByRegion(Region region);
+
+}
+
+
