@@ -1,11 +1,8 @@
-package com.example.pidev.Controller.hebergement;
+package com.example.pidev.controller.hebergement;
 
 
-import com.example.pidev.Interface.hebergement.IHebergementService;
 import com.example.pidev.Interface.hebergement.IReservationChambreService;
 import com.example.pidev.entity.hebergement.ReservationChambre;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +10,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservationchambre")
-@CrossOrigin("http://localhost:4200")
-
 public class ReservationChambreController {
     @Autowired
     IReservationChambreService reservationchambreService;
-    @Autowired
-    IHebergementService hebergementService; // Service pour récupérer l'hébergement par ID
 
     @PostMapping("/addreservationchambre")  // http://localhost:8089/tourisme/reservationchambre/addreservationchambre
     public ReservationChambre addReservationChambre(@RequestBody ReservationChambre reservationchambre)
@@ -27,13 +20,10 @@ public class ReservationChambreController {
         return reservationchambreService.addReservationChambre(reservationchambre);
     }
 
-
-    @PutMapping("/modifyreservationchambre/{idReservationChambre}") // Ajouter l'ID dans l'URL
-    public ReservationChambre modifyReservationChambre(@PathVariable Long idReservationChambre, @RequestBody ReservationChambre reservationchambre) {
-        reservationchambre.setId_reservation(idReservationChambre); // Assurez-vous que l'ID est bien défini dans l'objet
+    @PutMapping("/modifyreservationchambre") // http://localhost:8089/tourisme/reservationchambre/modifyreservationchambre
+    public ReservationChambre modifyReservationChambre(@RequestBody ReservationChambre reservationchambre) {
         return reservationchambreService.updateReservationChambre(reservationchambre);
     }
-
 
     @DeleteMapping("/removereservationchambre/{reservationchambre-id}") // http://localhost:8089/tourisme/reservationchambre/removereservationchambre/{reservationchambre-id}
     public void removeReservationChambre(@PathVariable("reservationchambre-id") Long reservationchambreId) {

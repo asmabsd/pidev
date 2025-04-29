@@ -1,4 +1,4 @@
-package com.example.pidev.Controller.hebergement;
+package com.example.pidev.controller.hebergement;
 
 import com.example.pidev.Interface.hebergement.IHebergementService;
 import com.example.pidev.entity.hebergement.Hebergement;
@@ -10,8 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/hebergement")
-@CrossOrigin("http://localhost:4200")
-
 public class HebergementController {
 
     @Autowired
@@ -22,9 +20,9 @@ public class HebergementController {
     {
         return hebergementService.addHebergement(h);
     }
-    @PutMapping("/modifyhebergement/{id}")
-    public Hebergement modifyHebergement(@PathVariable Long id, @RequestBody Hebergement h) {
-        h.setId_hebergement(id); // Assure-toi que l'ID soit bien défini dans l'objet
+
+    @PutMapping("/modifyhebergement") // http://localhost:8089/tourisme/hebergement/modifyhebergement
+    public Hebergement modifyHebergement(@RequestBody Hebergement h) {
         return hebergementService.updateHebergement(h);
     }
 
@@ -67,11 +65,5 @@ public class HebergementController {
             @RequestBody List<Long> idReservations) {
         return hebergementService.affecterReservationsAHebergement(idHebergement, idReservations);
     }
-    @GetMapping("/reservations/{idHebergement}")
-    public List<ReservationChambre> getReservationsByHebergement(@PathVariable Long idHebergement) {
-        return hebergementService.getReservationsByHebergement(idHebergement);
-    }
-
-
 
 }
