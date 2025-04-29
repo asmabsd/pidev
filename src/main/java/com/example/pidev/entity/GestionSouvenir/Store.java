@@ -2,6 +2,7 @@ package com.example.pidev.entity.GestionSouvenir;
 
 import com.example.pidev.entity.User.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -88,5 +89,13 @@ public class Store {
 
     public void setStatus(StoreStatus status) {
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
